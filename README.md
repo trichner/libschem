@@ -6,3 +6,6 @@ Note that it provides less features than the actual WorldEdit implementation in 
 Features:
 - can load and save schematics
 - can rotate schematics in the X-Z plane
+
+Todo:
+- merge upstream (we are quite a bit behind)
