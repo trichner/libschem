@@ -34,7 +34,7 @@ import java.io.IOException;
  *
  * @author sk89q
  */
-public class Cuboid {
+public class Cuboid implements Cloneable {
     /**
      * Flip direction.
      */
