@@ -46,10 +46,6 @@ public class BaseBlock extends Block {
         super(type, data);
     }
 
-    public int getMask() {
-        return ~0;
-    }
-
     /**
      * Get the type of block.
      * 

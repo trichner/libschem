@@ -556,28 +556,6 @@ public final class BlockData {
                 return mod((data & 0x3) + 1, 4) | store;  // switch type with bottom bits and reapply top bits
             }
 
-        /*case BlockID.QUARTZ_BLOCK:
-            if (increment == -1 && data > 2) {
-                switch (data) {
-                case 2: return 3;
-                case 3: return 4;
-                case 4: return 2;
-                }
-            } else if (increment == 1) {
-                switch (data) {
-                case 0:
-                    return 1;
-                case 1:
-                    return 2;
-                case 2:
-                case 3:
-                case 4:
-                    return 0;
-                }
-            } else {
-                return -1;
-            }*/
-
         case BlockID.LONG_GRASS:
         case BlockID.SANDSTONE:
         case BlockID.DIRT:

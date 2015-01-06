@@ -160,7 +160,7 @@ public class MCEditSchematicFormat extends SchematicFormat {
                 for (int z = 0; z < length; ++z) {
                     int index = y * width * length + z * width + x;
                     BlockVector pt = new BlockVector(x, y, z);
-                    BaseBlock block = getBlockForId(blocks[index], blockData[index]);
+                    BaseBlock block = new BaseBlock(blocks[index], blockData[index]);
 
                     if (block instanceof TileEntityBlock && tileEntitiesMap.containsKey(pt)) {
                         block.setNbtData(new CompoundTag("", tileEntitiesMap.get(pt)));
