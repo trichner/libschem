@@ -61,6 +61,16 @@ public class Cuboid implements Cloneable {
     }
 
     /**
+     * Constructs the clipboard.
+     *
+     * @param cuboid
+     */
+    public Cuboid(Cuboid cuboid) {
+        this.data = cuboid.data;
+        this.size = cuboid.size;
+    }
+
+    /**
      * Get the width (X-direction) of the clipboard.
      *
      * @return width
