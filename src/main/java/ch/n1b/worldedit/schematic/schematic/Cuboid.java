@@ -20,9 +20,11 @@
 package ch.n1b.worldedit.schematic.schematic;
 
 
+import ch.n1b.vector.Vec3D;
 import ch.n1b.worldedit.schematic.block.BaseBlock;
 import ch.n1b.worldedit.schematic.block.BlockID;
 import ch.n1b.worldedit.schematic.data.DataException;
+import ch.n1b.worldedit.schematic.minions.Vectors;
 import ch.n1b.worldedit.schematic.vector.Vector;
 import ch.n1b.worldedit.schematic.vector.Vector2D;
 
@@ -40,7 +42,7 @@ public class Cuboid implements Cloneable {
      */
 
     private BaseBlock[][][] data;
-    private Vector size;
+    private Vec3D size;
 
     /**
      * Constructs the clipboard.
@@ -48,8 +50,17 @@ public class Cuboid implements Cloneable {
      * @param size
      */
     public Cuboid(Vector size) {
+        this(Vectors.toVec3D(size));
+    }
+
+    /**
+     * Constructs the clipboard.
+     *
+     * @param size
+     */
+    public Cuboid(Vec3D size) {
         this.size = size;
-        data = new BaseBlock[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
+        data = new BaseBlock[size.X][size.Y][size.Z];
     }
 
     /**
@@ -58,7 +69,7 @@ public class Cuboid implements Cloneable {
      * @return width
      */
     public int getWidth() {
-        return size.getBlockX();
+        return size.X;
     }
 
     /**
@@ -67,7 +78,7 @@ public class Cuboid implements Cloneable {
      * @return length
      */
     public int getLength() {
-        return size.getBlockZ();
+        return size.Z;
     }
 
     /**
@@ -76,7 +87,7 @@ public class Cuboid implements Cloneable {
      * @return height
      */
     public int getHeight() {
-        return size.getBlockY();
+        return size.Y;
     }
 
     /**
@@ -95,7 +106,7 @@ public class Cuboid implements Cloneable {
         final int width = getWidth();
         final int length = getLength();
         final int height = getHeight();
-        final Vector sizeRotated = size.transform2D(angle, 0, 0, 0, 0);
+        final Vector sizeRotated = Vectors.toVector(size).transform2D(angle, 0, 0, 0, 0);
         final int shiftX = sizeRotated.getX() < 0 ? -sizeRotated.getBlockX() - 1 : 0;
         final int shiftZ = sizeRotated.getZ() < 0 ? -sizeRotated.getBlockZ() - 1 : 0;
 
@@ -131,34 +142,9 @@ public class Cuboid implements Cloneable {
         }
 
         data = newData;
-        size = new Vector(Math.abs(sizeRotated.getBlockX()),
+        size = new Vec3D(Math.abs(sizeRotated.getBlockX()),
                           Math.abs(sizeRotated.getBlockY()),
                           Math.abs(sizeRotated.getBlockZ()));
-    }
-
-    /**
-     * Places the blocks in a position from the minimum corner.
-     *
-     * @param pos
-     * @param noAir
-     */
-    public void place(Vector pos, boolean noAir){ // TODO
-        for (int x = 0; x < size.getBlockX(); ++x) {
-            for (int y = 0; y < size.getBlockY(); ++y) {
-                for (int z = 0; z < size.getBlockZ(); ++z) {
-                    final BaseBlock block = data[x][y][z];
-                    if (block == null) {
-                        continue;
-                    }
-
-                    if (noAir && block.isAir()) {
-                        continue;
-                    }
-
-                    //editSession.setBlock(new Vector(x, y, z).add(pos), block);
-                }
-            }
-        }
     }
 
     /**
@@ -170,11 +156,22 @@ public class Cuboid implements Cloneable {
      * @deprecated Use {@link #getBlock(Vector)} instead
      */
     public BaseBlock getPoint(Vector pos) throws ArrayIndexOutOfBoundsException {
+        return getPoint(Vectors.toVec3D(pos));
+    }
+
+    /**
+     * Get one point in the copy.
+     *
+     * @param pos The point, relative to the origin of the copy (0, 0, 0) and not to the actual copy origin.
+     * @return air, if this block was outside the (non-cuboid) selection while copying
+     * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
+     * @deprecated Use {@link #getBlock(Vector)} instead
+     */
+    public BaseBlock getPoint(Vec3D pos) throws ArrayIndexOutOfBoundsException {
         final BaseBlock block = getBlock(pos);
         if (block == null) {
             return new BaseBlock(BlockID.AIR);
         }
-
         return block;
     }
 
@@ -185,8 +182,19 @@ public class Cuboid implements Cloneable {
      * @return null, if this block was outside the (non-cuboid) selection while copying
      * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
      */
+    public BaseBlock getBlock(Vec3D pos) throws ArrayIndexOutOfBoundsException {
+        return data[pos.X][pos.Y][pos.Z];
+    }
+
+    /**
+     * Get one point in the copy.
+     *
+     * @param pos The point, relative to the origin of the copy (0, 0, 0) and not to the actual copy origin.
+     * @return null, if this block was outside the (non-cuboid) selection while copying
+     * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
+     */
     public BaseBlock getBlock(Vector pos) throws ArrayIndexOutOfBoundsException {
-        return data[pos.getBlockX()][pos.getBlockY()][pos.getBlockZ()];
+        return getBlock(Vectors.toVec3D(pos));
     }
 
     /**
@@ -200,11 +208,21 @@ public class Cuboid implements Cloneable {
     }
 
     /**
+     * Set one point in the copy. Pass null to remove the block.
+     *
+     * @param pt The point, relative to the origin of the copy (0, 0, 0) and not to the actual copy origin.
+     * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
+     */
+    public void setBlock(Vec3D pt, BaseBlock block) {
+        data[pt.X][pt.Y][pt.Z] = block;
+    }
+
+    /**
      * Get the size of the copy.
      *
      * @return
      */
-    public Vector getSize() {
+    public Vec3D getSize() {
         return size;
     }
 
