@@ -6,7 +6,7 @@
 
     <groupId>ch.n1b.libschem</groupId>
     <artifactId>libschem</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
 
     <repositories>
         <!-- bukkit is dead! long live spigot! -->

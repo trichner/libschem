@@ -23,13 +23,9 @@ package ch.n1b.worldedit.schematic.schematic;
 import ch.n1b.vector.Vec3D;
 import ch.n1b.worldedit.schematic.block.BaseBlock;
 import ch.n1b.worldedit.schematic.block.BlockID;
-import ch.n1b.worldedit.schematic.data.DataException;
 import ch.n1b.worldedit.schematic.minions.Vectors;
 import ch.n1b.worldedit.schematic.vector.Vector;
 import ch.n1b.worldedit.schematic.vector.Vector2D;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * The clipboard remembers the state of a cuboid region.
@@ -41,8 +37,8 @@ public class Cuboid implements Cloneable {
      * Flip direction.
      */
 
-    private BaseBlock[][][] data;
-    private Vec3D size;
+    protected BaseBlock[][][] data;
+    protected Vec3D size;
 
     /**
      * Constructs the clipboard.
@@ -227,19 +223,5 @@ public class Cuboid implements Cloneable {
      */
     public Vec3D getSize() {
         return size;
-    }
-
-    /**
-     * Load a .schematic file into a clipboard.
-     *
-     * @param path
-     * @return clipboard
-     * @throws DataException
-     * @throws IOException
-     */
-    @Deprecated
-    public static Cuboid loadSchematic(File path)
-            throws DataException, IOException {
-        return SchematicFormat.MCEDIT.load(path);
     }
 }
