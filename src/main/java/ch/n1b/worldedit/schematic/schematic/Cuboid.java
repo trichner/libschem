@@ -48,6 +48,7 @@ public class Cuboid implements Cloneable {
      * Constructs the clipboard.
      *
      * @param size
+     * @deprecated use the {@link Vec3D} version
      */
     public Cuboid(Vector size) {
         this(Vectors.toVec3D(size));
@@ -153,7 +154,7 @@ public class Cuboid implements Cloneable {
      * @param pos The point, relative to the origin of the copy (0, 0, 0) and not to the actual copy origin.
      * @return air, if this block was outside the (non-cuboid) selection while copying
      * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
-     * @deprecated Use {@link #getBlock(Vector)} instead
+     * @deprecated use the {@link Vec3D} version
      */
     public BaseBlock getPoint(Vector pos) throws ArrayIndexOutOfBoundsException {
         return getPoint(Vectors.toVec3D(pos));
@@ -165,7 +166,7 @@ public class Cuboid implements Cloneable {
      * @param pos The point, relative to the origin of the copy (0, 0, 0) and not to the actual copy origin.
      * @return air, if this block was outside the (non-cuboid) selection while copying
      * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
-     * @deprecated Use {@link #getBlock(Vector)} instead
+     * @deprecated Use {@link #getBlock(Vec3D)} instead
      */
     public BaseBlock getPoint(Vec3D pos) throws ArrayIndexOutOfBoundsException {
         final BaseBlock block = getBlock(pos);
@@ -192,6 +193,7 @@ public class Cuboid implements Cloneable {
      * @param pos The point, relative to the origin of the copy (0, 0, 0) and not to the actual copy origin.
      * @return null, if this block was outside the (non-cuboid) selection while copying
      * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
+     * @deprecated use the {@link Vec3D} version
      */
     public BaseBlock getBlock(Vector pos) throws ArrayIndexOutOfBoundsException {
         return getBlock(Vectors.toVec3D(pos));
@@ -202,6 +204,7 @@ public class Cuboid implements Cloneable {
      *
      * @param pt The point, relative to the origin of the copy (0, 0, 0) and not to the actual copy origin.
      * @throws ArrayIndexOutOfBoundsException if the position is outside the bounds of the CuboidClipboard
+     * @deprecated use the {@link Vec3D} version
      */
     public void setBlock(Vector pt, BaseBlock block) {
         data[pt.getBlockX()][pt.getBlockY()][pt.getBlockZ()] = block;
