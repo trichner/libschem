@@ -12,22 +12,18 @@
         <!-- bukkit is dead! long live spigot! -->
         <repository>
             <id>spigot-repo</id>
-            <url>http://repo.md-5.net/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>k42.ch-jenkins</id>
-            <url>http://k42.ch/jenkins/plugin/repository/everything/</url>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 
     <dependencies>
+        <!--Spigot-API-->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.8-R0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>ch.n1b.common-n1b</groupId>
             <artifactId>common-n1b</artifactId>
