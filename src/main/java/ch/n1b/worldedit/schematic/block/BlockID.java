@@ -1,28 +1,26 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010 sk89q <http://www.sk89q.com> and contributors
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package ch.n1b.worldedit.schematic.block;
 
 /**
  * List of block IDs.
- *
- * @author sk89q
  */
 public final class BlockID {
     public static final int AIR = 0;
@@ -196,11 +194,40 @@ public final class BlockID {
     public static final int LOG2 = 162;
     public static final int ACACIA_STAIRS = 163;
     public static final int DARK_OAK_STAIRS = 164;
+    public static final int SLIME = 165;
+    public static final int BARRIER = 166;
+    public static final int IRON_TRAP_DOOR = 167;
+    public static final int PRISMARINE = 168;
+    public static final int SEA_LANTERN = 169;
     public static final int HAY_BLOCK = 170;
     public static final int CARPET = 171;
     public static final int HARDENED_CLAY = 172;
     public static final int COAL_BLOCK = 173;
     public static final int PACKED_ICE = 174;
     public static final int DOUBLE_PLANT = 175;
+    public static final int STANDING_BANNER = 176;
+    public static final int WALL_BANNER = 177;
+    public static final int DAYLIGHT_SENSOR_INVERTED = 178;
+    public static final int RED_SANDSTONE = 179;
+    public static final int RED_SANDSTONE_STAIRS = 180;
+    public static final int DOUBLE_STEP2 = 181;
+    public static final int STEP2 = 182;
+    public static final int SPRUCE_FENCE_GATE = 183;
+    public static final int BIRCH_FENCE_GATE = 184;
+    public static final int JUNGLE_FENCE_GATE = 185;
+    public static final int DARK_OAK_FENCE_GATE = 186;
+    public static final int ACACIA_FENCE_GATE = 187;
+    public static final int SPRUCE_FENCE = 188;
+    public static final int BIRCH_FENCE = 189;
+    public static final int JUNGLE_FENCE = 190;
+    public static final int DARK_OAK_FENCE = 191;
+    public static final int ACACIA_FENCE = 192;
+    public static final int SPRUCE_DOOR = 193;
+    public static final int BIRCH_DOOR = 194;
+    public static final int JUNGLE_DOOR = 195;
+    public static final int ACACIA_DOOR = 196;
+    public static final int DARK_OAK_DOOR = 197;
 
+    private BlockID() {
+    }
 }
