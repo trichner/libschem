@@ -6,7 +6,7 @@
 
     <groupId>ch.n1b.libschem</groupId>
     <artifactId>libschem</artifactId>
-    <version>0.1.4</version>
+    <version>0.2.0</version>
 
     <repositories>
         <!-- bukkit is dead! long live spigot! -->
@@ -32,6 +32,14 @@
     </dependencies>
 
     <build>
+        <extensions>
+            <!-- Enabling the use of Wagon file -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-file</artifactId>
+                <version>1.0-beta-6</version>
+            </extension>
+        </extensions>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -44,12 +52,18 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>repo</id>
+            <url>file:/var/www/repo</url>
+        </repository>
+    </distributionManagement>
 
 </project>
