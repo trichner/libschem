@@ -19,10 +19,10 @@
 package ch.n1b.worldedit.schematic.block;
 
 
+import ch.n1b.worldedit.jnbt.CompoundTag;
+import ch.n1b.worldedit.jnbt.StringTag;
+import ch.n1b.worldedit.jnbt.Tag;
 import ch.n1b.worldedit.schematic.data.DataException;
-import ch.n1b.worldedit.schematic.jnbt.CompoundTag;
-import ch.n1b.worldedit.schematic.jnbt.StringTag;
-import ch.n1b.worldedit.schematic.jnbt.Tag;
 
 /**
  * Represents a mutable copy of a block that is not tied to any 'real' block in a world.

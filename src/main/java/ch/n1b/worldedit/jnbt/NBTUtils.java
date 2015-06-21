@@ -1,56 +1,46 @@
-package ch.n1b.worldedit.schematic.jnbt;
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import com.sun.media.sound.InvalidFormatException;
+package ch.n1b.worldedit.jnbt;
+
+import ch.n1b.vector.Vec3D;
 
 import java.util.Map;
 
-
-/*
- * JNBT License
- *
- * Copyright (c) 2010 Graham Edgecombe
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright notice,
- *       this list of conditions and the following disclaimer.
- *
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *
- *     * Neither the name of the JNBT team nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A class which contains NBT-related utility methods.
- *
- * @author Graham Edgecombe
  *
  */
 public final class NBTUtils {
 
     /**
+     * Default private constructor.
+     */
+    private NBTUtils() {
+    }
+
+    /**
      * Gets the type name of a tag.
      *
-     * @param clazz
-     *            The tag class.
+     * @param clazz the tag class
      * @return The type name.
      */
     public static String getTypeName(Class<? extends Tag> clazz) {
@@ -87,11 +77,9 @@ public final class NBTUtils {
     /**
      * Gets the type code of a tag class.
      *
-     * @param clazz
-     *            The tag class.
+     * @param clazz the tag class
      * @return The type code.
-     * @throws IllegalArgumentException
-     *             if the tag class is invalid.
+     * @throws IllegalArgumentException if the tag class is invalid.
      */
     public static int getTypeCode(Class<? extends Tag> clazz) {
         if (clazz.equals(ByteArrayTag.class)) {
@@ -127,11 +115,9 @@ public final class NBTUtils {
     /**
      * Gets the class of a type of tag.
      *
-     * @param type
-     *            The type.
+     * @param type the type
      * @return The class.
-     * @throws IllegalArgumentException
-     *             if the tag type is invalid.
+     * @throws IllegalArgumentException if the tag type is invalid.
      */
     public static Class<? extends Tag> getTypeClass(int type) {
         switch (type) {
@@ -166,23 +152,29 @@ public final class NBTUtils {
     }
 
     /**
-     * Default private constructor.
+     * Read a vector from a list tag containing ideally three values: the
+     * X, Y, and Z components.
+     *
+     * <p>For values that are unavailable, their values will be 0.</p>
+     *
+     * @param listTag the list tag
+     * @return a vector
      */
-    private NBTUtils() {
-
+    public static Vec3D toVec3D(ListTag listTag) {
+        checkNotNull(listTag);
+        return new Vec3D(listTag.asInt(0), listTag.asInt(1), listTag.asInt(2));
     }
 
     /**
      * Get child tag of a NBT structure.
      *
-     * @param items
-     * @param key
-     * @param expected
+     * @param items the map to read from
+     * @param key the key to look for
+     * @param expected the expected NBT class type
      * @return child tag
      * @throws InvalidFormatException
      */
-    public static <T extends Tag> T getChildTag(Map<String,Tag> items, String key,
-            Class<T> expected) throws InvalidFormatException {
+    public static <T extends Tag> T getChildTag(Map<String, Tag> items, String key, Class<T> expected) throws InvalidFormatException {
         if (!items.containsKey(key)) {
             throw new InvalidFormatException("Missing a \"" + key + "\" tag");
         }

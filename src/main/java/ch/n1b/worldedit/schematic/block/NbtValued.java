@@ -18,8 +18,8 @@
 
 package ch.n1b.worldedit.schematic.block;
 
+import ch.n1b.worldedit.jnbt.CompoundTag;
 import ch.n1b.worldedit.schematic.data.DataException;
-import ch.n1b.worldedit.schematic.jnbt.CompoundTag;
 
 
 /**

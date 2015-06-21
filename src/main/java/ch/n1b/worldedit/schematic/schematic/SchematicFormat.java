@@ -1,23 +1,26 @@
 /*
- * WorldEdit
- * Copyright (C) 2012 sk89q <http://www.sk89q.com> and contributors
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package ch.n1b.worldedit.schematic.schematic;
 
+
+import ch.n1b.worldedit.schematic.block.BaseBlock;
 import ch.n1b.worldedit.schematic.data.DataException;
 
 import java.io.File;
@@ -30,11 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Represents a format that a schematic can be stored as
- * @author zml2008
- */
 public abstract class SchematicFormat {
+
     private static final Map<String, SchematicFormat> SCHEMATIC_FORMATS = new HashMap<String, SchematicFormat>();
 
     // Built-in schematic formats
@@ -89,6 +89,42 @@ public abstract class SchematicFormat {
         return lookupNames;
     }
 
+    public BaseBlock getBlockForId(int id, short data) {
+        BaseBlock block;
+        switch (id) {
+            /*case BlockID.WALL_SIGN:
+            case BlockID.SIGN_POST:
+                block = new SignBlock(id, data);
+                break;
+
+            case BlockID.CHEST:
+                block = new ChestBlock(data);
+                break;
+
+            case BlockID.FURNACE:
+            case BlockID.BURNING_FURNACE:
+                block = new FurnaceBlock(id, data);
+                break;
+
+            case BlockID.DISPENSER:
+                block = new DispenserBlock(data);
+                break;
+
+            case BlockID.MOB_SPAWNER:
+                block = new MobSpawnerBlock(id);
+                break;
+
+            case BlockID.NOTE_BLOCK:
+                block = new NoteBlock(data);
+                break;*/
+
+            default:
+                block = new BaseBlock(id, data);
+                break;
+        }
+        return block;
+    }
+
     /**
      * Loads a schematic from the given file into a CuboidClipboard
      * @param file The file to load from
@@ -109,4 +145,5 @@ public abstract class SchematicFormat {
     public abstract void save(Cuboid clipboard, File file) throws IOException, DataException;
 
     public abstract boolean isOfFormat(File file);
+
 }

@@ -1,76 +1,75 @@
 /*
- * WorldEdit
- * Copyright (C) 2012 sk89q <http://www.sk89q.com> and contributors
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package ch.n1b.worldedit.schematic.schematic;
 
+
+import ch.n1b.vector.Vec3D;
+import ch.n1b.worldedit.jnbt.ByteArrayTag;
+import ch.n1b.worldedit.jnbt.CompoundTag;
+import ch.n1b.worldedit.jnbt.IntTag;
+import ch.n1b.worldedit.jnbt.ListTag;
+import ch.n1b.worldedit.jnbt.NBTConstants;
+import ch.n1b.worldedit.jnbt.NBTInputStream;
+import ch.n1b.worldedit.jnbt.NBTOutputStream;
+import ch.n1b.worldedit.jnbt.NamedTag;
+import ch.n1b.worldedit.jnbt.ShortTag;
+import ch.n1b.worldedit.jnbt.StringTag;
+import ch.n1b.worldedit.jnbt.Tag;
 import ch.n1b.worldedit.schematic.block.BaseBlock;
-import ch.n1b.worldedit.schematic.block.TileEntityBlock;
 import ch.n1b.worldedit.schematic.data.DataException;
-import ch.n1b.worldedit.schematic.jnbt.ByteArrayTag;
-import ch.n1b.worldedit.schematic.jnbt.CompoundTag;
-import ch.n1b.worldedit.schematic.jnbt.IntTag;
-import ch.n1b.worldedit.schematic.jnbt.ListTag;
-import ch.n1b.worldedit.schematic.jnbt.NBTConstants;
-import ch.n1b.worldedit.schematic.jnbt.NBTInputStream;
-import ch.n1b.worldedit.schematic.jnbt.NBTOutputStream;
-import ch.n1b.worldedit.schematic.jnbt.ShortTag;
-import ch.n1b.worldedit.schematic.jnbt.StringTag;
-import ch.n1b.worldedit.schematic.jnbt.Tag;
 import ch.n1b.worldedit.schematic.vector.BlockVector;
-import ch.n1b.worldedit.schematic.vector.Vector;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-/**
- * @author zml2008
- */
 public class MCEditSchematicFormat extends SchematicFormat {
+
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
 
     protected MCEditSchematicFormat() {
         super("MCEdit", "mcedit", "mce");
     }
 
-    @Override
-    public Cuboid load(File file) throws IOException, DataException {
-        FileInputStream stream = new FileInputStream(file);
+    public Cuboid load(InputStream stream) throws IOException, DataException {
         NBTInputStream nbtStream = new NBTInputStream(
                 new GZIPInputStream(stream));
 
-        Vector origin = new Vector();
-        Vector offset = new Vector();
-
         // Schematic tag
-        CompoundTag schematicTag = (CompoundTag) nbtStream.readTag();
+        NamedTag rootTag = nbtStream.readNamedTag();
         nbtStream.close();
-        if (!schematicTag.getName().equals("Schematic")) {
+        if (!rootTag.getName().equals("Schematic")) {
             throw new DataException("Tag \"Schematic\" does not exist or is not first");
         }
+
+        CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
         // Check
         Map<String, Tag> schematic = schematicTag.getValue();
@@ -152,7 +151,7 @@ public class MCEditSchematicFormat extends SchematicFormat {
             tileEntitiesMap.put(vec, values);
         }
 
-        Vector size = new Vector(width, height, length);
+        Vec3D size = new Vec3D(width, height, length);
         Cuboid clipboard = new Cuboid(size);
 
         for (int x = 0; x < width; ++x) {
@@ -160,16 +159,22 @@ public class MCEditSchematicFormat extends SchematicFormat {
                 for (int z = 0; z < length; ++z) {
                     int index = y * width * length + z * width + x;
                     BlockVector pt = new BlockVector(x, y, z);
-                    BaseBlock block = new BaseBlock(blocks[index], blockData[index]);
+                    BaseBlock block = getBlockForId(blocks[index], blockData[index]);
 
-                    if (block instanceof TileEntityBlock && tileEntitiesMap.containsKey(pt)) {
-                        block.setNbtData(new CompoundTag("", tileEntitiesMap.get(pt)));
+                    if (tileEntitiesMap.containsKey(pt)) {
+                        block.setNbtData(new CompoundTag(tileEntitiesMap.get(pt)));
                     }
                     clipboard.setBlock(pt, block);
                 }
             }
         }
+
         return clipboard;
+    }
+
+    @Override
+    public Cuboid load(File file) throws IOException, DataException {
+        return load(new FileInputStream(file));
     }
 
     @Override
@@ -189,16 +194,17 @@ public class MCEditSchematicFormat extends SchematicFormat {
         }
 
         HashMap<String, Tag> schematic = new HashMap<String, Tag>();
-        schematic.put("Width", new ShortTag("Width", (short) width));
-        schematic.put("Length", new ShortTag("Length", (short) length));
-        schematic.put("Height", new ShortTag("Height", (short) height));
-        schematic.put("Materials", new StringTag("Materials", "Alpha"));
+        schematic.put("Width", new ShortTag((short) width));
+        schematic.put("Length", new ShortTag((short) length));
+        schematic.put("Height", new ShortTag((short) height));
+        schematic.put("Materials", new StringTag("Alpha"));
+        schematic.put("X-CreatedBy", new StringTag("libschem"));
 
         // Copy
         byte[] blocks = new byte[width * height * length];
         byte[] addBlocks = null;
         byte[] blockData = new byte[width * height * length];
-        ArrayList<Tag> tileEntities = new ArrayList<Tag>();
+        ArrayList<Tag> tileEntities = new ArrayList<>();
 
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
@@ -220,43 +226,38 @@ public class MCEditSchematicFormat extends SchematicFormat {
                     blocks[index] = (byte) block.getType();
                     blockData[index] = (byte) block.getData();
 
-                    // Store TileEntity data
-                    if (block instanceof TileEntityBlock) {
-                        TileEntityBlock tileEntityBlock = block;
-
-                        // Get the list of key/values from the block
-                        CompoundTag rawTag = tileEntityBlock.getNbtData();
-                        if (rawTag != null) {
-                            Map<String, Tag> values = new HashMap<String, Tag>();
-                            for (Entry<String, Tag> entry : rawTag.getValue().entrySet()) {
-                                values.put(entry.getKey(), entry.getValue());
-                            }
-                            
-                            values.put("id", new StringTag("id", tileEntityBlock.getNbtId()));
-                            values.put("x", new IntTag("x", x));
-                            values.put("y", new IntTag("y", y));
-                            values.put("z", new IntTag("z", z));
-                            
-                            CompoundTag tileEntityTag = new CompoundTag("TileEntity", values);
-                            tileEntities.add(tileEntityTag);
+                    // Get the list of key/values from the block
+                    CompoundTag rawTag = block.getNbtData();
+                    if (rawTag != null) {
+                        Map<String, Tag> values = new HashMap<>();
+                        for (Entry<String, Tag> entry : rawTag.getValue().entrySet()) {
+                            values.put(entry.getKey(), entry.getValue());
                         }
+
+                        values.put("id", new StringTag(block.getNbtId()));
+                        values.put("x", new IntTag(x));
+                        values.put("y", new IntTag(y));
+                        values.put("z", new IntTag(z));
+
+                        CompoundTag tileEntityTag = new CompoundTag(values);
+                        tileEntities.add(tileEntityTag);
                     }
                 }
             }
         }
 
-        schematic.put("Blocks", new ByteArrayTag("Blocks", blocks));
-        schematic.put("Data", new ByteArrayTag("Data", blockData));
-        schematic.put("Entities", new ListTag("Entities", CompoundTag.class, new ArrayList<Tag>()));
-        schematic.put("TileEntities", new ListTag("TileEntities", CompoundTag.class, tileEntities));
+        schematic.put("Blocks", new ByteArrayTag(blocks));
+        schematic.put("Data", new ByteArrayTag(blockData));
+        schematic.put("Entities", new ListTag(CompoundTag.class, new ArrayList<Tag>()));
+        schematic.put("TileEntities", new ListTag(CompoundTag.class, tileEntities));
         if (addBlocks != null) {
-            schematic.put("AddBlocks", new ByteArrayTag("AddBlocks", addBlocks));
+            schematic.put("AddBlocks", new ByteArrayTag(addBlocks));
         }
 
         // Build and output
-        CompoundTag schematicTag = new CompoundTag("Schematic", schematic);
-        NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file));
-        stream.writeTag(schematicTag);
+        CompoundTag schematicTag = new CompoundTag(schematic);
+        NBTOutputStream stream = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file)));
+        stream.writeNamedTag("Schematic", schematicTag);
         stream.close();
     }
 
@@ -307,4 +308,5 @@ public class MCEditSchematicFormat extends SchematicFormat {
         }
         return expected.cast(tag);
     }
+
 }

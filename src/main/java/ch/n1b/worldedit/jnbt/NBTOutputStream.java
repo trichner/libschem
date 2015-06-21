@@ -1,60 +1,40 @@
-package ch.n1b.worldedit.schematic.jnbt;
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package ch.n1b.worldedit.jnbt;
 
 import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.zip.GZIPOutputStream;
+import java.util.Map;
 
-
-/*
- * JNBT License
- * 
- * Copyright (c) 2010 Graham Edgecombe
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright notice,
- *       this list of conditions and the following disclaimer.
- *       
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *       
- *     * Neither the name of the JNBT team nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE. 
- */
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * <p>
  * This class writes <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
- * <code>Tag</code> objects to an underlying <code>OutputStream</code>.
- * </p>
+ * {@code Tag} objects to an underlying {@code OutputStream}.
  * 
- * <p>
- * The NBT format was created by Markus Persson, and the specification may be
+ * <p>The NBT format was created by Markus Persson, and the specification may be
  * found at <a href="http://www.minecraft.net/docs/NBT.txt">
- * http://www.minecraft.net/docs/NBT.txt</a>.
- * </p>
- * 
- * @author Graham Edgecombe
- * 
+ * http://www.minecraft.net/docs/NBT.txt</a>.</p>
  */
 public final class NBTOutputStream implements Closeable {
 
@@ -64,7 +44,7 @@ public final class NBTOutputStream implements Closeable {
     private final DataOutputStream os;
 
     /**
-     * Creates a new <code>NBTOutputStream</code>, which will write data to the
+     * Creates a new {@code NBTOutputStream}, which will write data to the
      * specified underlying output stream.
      * 
      * @param os
@@ -73,7 +53,7 @@ public final class NBTOutputStream implements Closeable {
      *             if an I/O error occurs.
      */
     public NBTOutputStream(OutputStream os) throws IOException {
-        this.os = new DataOutputStream(new GZIPOutputStream(os));
+        this.os = new DataOutputStream(os);
     }
 
     /**
@@ -84,9 +64,11 @@ public final class NBTOutputStream implements Closeable {
      * @throws IOException
      *             if an I/O error occurs.
      */
-    public void writeTag(Tag tag) throws IOException {
+    public void writeNamedTag(String name, Tag tag) throws IOException {
+        checkNotNull(name);
+        checkNotNull(tag);
+
         int type = NBTUtils.getTypeCode(tag.getClass());
-        String name = tag.getName();
         byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
 
         os.writeByte(type);
@@ -153,7 +135,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Byte</code> tag.
+     * Writes a {@code TAG_Byte} tag.
      * 
      * @param tag
      *            The tag.
@@ -165,7 +147,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Byte_Array</code> tag.
+     * Writes a {@code TAG_Byte_Array} tag.
      * 
      * @param tag
      *            The tag.
@@ -179,7 +161,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Compound</code> tag.
+     * Writes a {@code TAG_Compound} tag.
      * 
      * @param tag
      *            The tag.
@@ -187,14 +169,14 @@ public final class NBTOutputStream implements Closeable {
      *             if an I/O error occurs.
      */
     private void writeCompoundTagPayload(CompoundTag tag) throws IOException {
-        for (Tag childTag : tag.getValue().values()) {
-            writeTag(childTag);
+        for (Map.Entry<String, Tag> entry : tag.getValue().entrySet()) {
+            writeNamedTag(entry.getKey(), entry.getValue());
         }
         os.writeByte((byte) 0); // end tag - better way?
     }
 
     /**
-     * Writes a <code>TAG_List</code> tag.
+     * Writes a {@code TAG_List} tag.
      * 
      * @param tag
      *            The tag.
@@ -208,13 +190,13 @@ public final class NBTOutputStream implements Closeable {
 
         os.writeByte(NBTUtils.getTypeCode(clazz));
         os.writeInt(size);
-        for (int i = 0; i < size; ++i) {
-            writeTagPayload(tags.get(i));
+        for (Tag tag1 : tags) {
+            writeTagPayload(tag1);
         }
     }
 
     /**
-     * Writes a <code>TAG_String</code> tag.
+     * Writes a {@code TAG_String} tag.
      * 
      * @param tag
      *            The tag.
@@ -228,7 +210,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Double</code> tag.
+     * Writes a {@code TAG_Double} tag.
      * 
      * @param tag
      *            The tag.
@@ -240,7 +222,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Float</code> tag.
+     * Writes a {@code TAG_Float} tag.
      * 
      * @param tag
      *            The tag.
@@ -252,7 +234,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Long</code> tag.
+     * Writes a {@code TAG_Long} tag.
      * 
      * @param tag
      *            The tag.
@@ -264,7 +246,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Int</code> tag.
+     * Writes a {@code TAG_Int} tag.
      * 
      * @param tag
      *            The tag.
@@ -276,7 +258,7 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Short</code> tag.
+     * Writes a {@code TAG_Short} tag.
      * 
      * @param tag
      *            The tag.
@@ -288,12 +270,9 @@ public final class NBTOutputStream implements Closeable {
     }
 
     /**
-     * Writes a <code>TAG_Empty</code> tag.
+     * Writes a {@code TAG_Empty} tag.
      * 
-     * @param tag
-     *            The tag.
-     * @throws IOException
-     *             if an I/O error occurs.
+     * @param tag the tag
      */
     private void writeEndTagPayload(EndTag tag) {
         /* empty */
@@ -302,11 +281,12 @@ public final class NBTOutputStream implements Closeable {
     private void writeIntArrayTagPayload(IntArrayTag tag) throws IOException {
         int[] data = tag.getValue();
         os.writeInt(data.length);
-        for (int i = 0; i < data.length; i++) {
-            os.writeInt(data[i]);
+        for (int aData : data) {
+            os.writeInt(aData);
         } 
     }
 
+    @Override
     public void close() throws IOException {
         os.close();
     }
